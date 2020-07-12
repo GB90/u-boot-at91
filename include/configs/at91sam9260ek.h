@@ -287,7 +287,7 @@
 	"uprootfs_usb=""usb reset;usb dev 0;fatload usb 0 $(loadaddr) $(rootfs);"							\
 						"mtdparts default;nand erase.part rootfs;nand write $(loadaddr) rootfs $(filesize)\0" 	\
 	"upbootstrap_ftp=""tftp $(loadaddr) $(bootstrap);nand erase 0 0x20000;nand write $(loadaddr) 0 0x1000\0"\
-	"upuboot_ftp=""tftp $(loadaddr) $(uboot);mtdparts default;nand erase.part bootloader;"				\						
+	"upuboot_ftp=""tftp $(loadaddr) $(uboot);mtdparts default;nand erase.part bootloader;"				\
 						"nand write $(loadaddr) $(ubootoffset) $(filesize)\0"	   						\
 	"upkernel_ftp=""mtdparts default;nand erase.part kernel;tftp $(loadaddr) $(kernel);"					\
 						"nand write $(loadaddr) kernel $(filesize)\0" 		\
