@@ -76,7 +76,7 @@ struct macb_dma_desc {
 #define TXBUF_MAXRETRY		0x20000000
 #define TXBUF_WRAP		0x40000000
 #define TXBUF_USED		0x80000000
-
+aaaaaaaaaaaaa
 struct macb_device {
 	void			*regs;
 
