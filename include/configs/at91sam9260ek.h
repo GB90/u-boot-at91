@@ -63,8 +63,10 @@
 
 /* LED */
 #define CONFIG_AT91_LED
-#define	CONFIG_RED_LED		AT91_PIN_PA9	/* this is the power led */
-#define	CONFIG_GREEN_LED	AT91_PIN_PA6	/* this is the user led */
+#define	CONFIG_GREEN_LED1	AT91_PIN_PC15	
+#define	CONFIG_GREEN_LED2	AT91_PIN_PC17
+#define CONFIG_GREEN_LED3	AT91_PIN_PC20
+#define CONFIG_GREEN_LED4	AT91_PIN_PC21
 
 #define CONFIG_BOOTDELAY	3
 
@@ -92,6 +94,7 @@
 #define CONFIG_CMD_NAND		1
 #define CONFIG_CMD_FAT
 #define CONFIG_CMD_USB		1
+#define CONFIG_CMD_MMC		1
 
 /*
  * SDRAM: 1 bank, min 32, max 128 MB
@@ -99,7 +102,7 @@
  */
 #define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_SDRAM_BASE		ATMEL_BASE_CS1
-#define CONFIG_SYS_SDRAM_SIZE		0x04000000
+#define CONFIG_SYS_SDRAM_SIZE		0x02000000
 
 /*
  * Initial stack pointer: 4k - GENERATED_GBL_DATA_SIZE in internal SRAM,
@@ -197,10 +200,10 @@
 #define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS	2
 #define CONFIG_USB_STORAGE		1
 
-#define CONFIG_SYS_LOAD_ADDR			0x22000000	/* load address */
+#define CONFIG_SYS_LOAD_ADDR			0x21000000	/* load address */
 
 #define CONFIG_SYS_MEMTEST_START		CONFIG_SYS_SDRAM_BASE
-#define CONFIG_SYS_MEMTEST_END			0x23e00000
+#define CONFIG_SYS_MEMTEST_END			0x21e00000
 
 #ifdef CONFIG_SYS_USE_DATAFLASH_CS0
 
@@ -262,8 +265,41 @@
 	"512k(dtb),6M(kernel)ro,-(rootfs) "				\
 	"root=/dev/mmcblk0p2 rw rootfstype=ext4 rootwait"
 #endif
+#define	CONFIG_EXTRA_ENV_SETTINGS 					\
+	"ethaddr=00:e0:a3:a4:98:67\0"\
+	"ipaddr=192.168.1.66\0"\
+	"serverip=192.168.1.33\0"\
+	"netmask=255.255.255.0\0"\
+	"gatewayip=192.168.1.1\0"\
+	"kernel=uImage\0"\
+	"rootfs=rootfs.ubifs\0"\
+	"uboot=u-boot.bin\0"\
+	"bootstrap=at91sam9260ek-nandflashboot-uboot-3.8.7.bin\0"\
+	"ubootoffset=0x20000\0"\
+	"ubootsize=0xE0000\0"\
+	"loadaddr=0x20800000\0"\
+	"upbootstrap_usb=""usb reset;usb dev 0;fatload usb 0 $(loadaddr) $(bootstrap);nand erase 0 0x20000;"	\
+                                          "nand write $(loadaddr) 0 0x1000\0"						\
+	"upuboot_usb=""usb reset;usb dev 0;fatload usb 0 $(loadaddr) $(uboot);mtdparts default;"			\
+                                          "nand erase.part bootloader;nand write $(loadaddr) $(ubootoffset) $(filesize)\0"		\
+	"upkernel_usb=""usb reset;usb dev 0;fatload usb 0 $(loadaddr) $(kernel);"   						\
+                                           "mtdparts default;nand erase.part kernel;nand write $(loadaddr) kernel $(filesize)\0"	\
+	"uprootfs_usb=""usb reset;usb dev 0;fatload usb 0 $(loadaddr) $(rootfs);"							\
+						"mtdparts default;nand erase.part rootfs;nand write $(loadaddr) rootfs $(filesize)\0" 	\
+	"upbootstrap_ftp=""tftp $(loadaddr) $(bootstrap);nand erase 0 0x20000;nand write $(loadaddr) 0 0x1000\0"\
+	"upuboot_ftp=""tftp $(loadaddr) $(uboot);mtdparts default;nand erase.part bootloader;"				\						
+						"nand write $(loadaddr) $(ubootoffset) $(filesize)\0"	   						\
+	"upkernel_ftp=""mtdparts default;nand erase.part kernel;tftp $(loadaddr) $(kernel);"					\
+						"nand write $(loadaddr) kernel $(filesize)\0" 		\
+	"uprootfs_ftp=""mtdparts default;nand erase.part rootfs;tftp $(loadaddr) $(rootfs);"			\
+						"nand write $(loadaddr) rootfs $(filesize)\0" 			\
+	"upall_ftp=run upbootstrap_ftp;run upuboot_ftp;run upkernel_ftp;run uprootfs_ftp;reset \0" 			  	 \
+	"upall_usb=run upbootstrap_usb;run upuboot_usb;run upkernel_usb;run uprootfs_usb;reset \0" 			   	\
+	"bootcmd=nand read 0x20800000 0x100000 0x300000; bootm \0"     	   								\
+	"bootargs=console=ttyS0,115200n8 init=/linuxrc ubi.mtd=3 root=ubi0:rootfs rootfstype=ubifs " 			\
+						"mtdparts=atmel_nand:128K@0(bootstrap),896K@128K(bootloader),5M@1M(kernel),-@6M(rootfs)\0"
 
-#define CONFIG_SYS_PROMPT		"U-Boot> "
+#define CONFIG_SYS_PROMPT		"GB9260> "
 #define CONFIG_SYS_CBSIZE		256
 #define CONFIG_SYS_MAXARGS		16
 #define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
